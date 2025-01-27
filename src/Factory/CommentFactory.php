@@ -43,6 +43,7 @@ final class CommentFactory extends PersistentProxyObjectFactory
                 'now'
             ),
             'post' => $post,
+            'rating' => self::faker()->numberBetween(1,5),
         ];
     }
 
