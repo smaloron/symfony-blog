@@ -3,6 +3,7 @@
 namespace App\Factory;
 
 use App\Entity\Post;
+use Random\RandomException;
 use Zenstruck\Foundry\Persistence\PersistentProxyObjectFactory;
 
 /**
@@ -31,19 +32,35 @@ final class PostFactory extends PersistentProxyObjectFactory
      * @see https://symfony.com/bundles/ZenstruckFoundryBundle/current/index.html#model-factories
      *
      * @todo add your default values here
+     * @throws RandomException
      */
     protected function defaults(): array|callable
     {
         $createdAt = self::faker()->dateTimeBetween('-18 months', 'now');
-        $updatedAt = self::faker()->dateTimeBetween($createdAt, 'now');
+
         return [
             'content' => self::$content,
             'createdAt' => $createdAt,
             'title' => self::faker()->unique()->sentence(),
-            'updatedAt' => $updatedAt,
+            'updatedAt' => $this->getRandomDate($createdAt, 60),
             'author' => UserFactory::random(),
             'theme' => PostThemeFactory::random(),
+            'publishedAt' => $this->getRandomDate($createdAt, 20),
         ];
+    }
+
+    /**
+     * @throws RandomException
+     */
+    private function getRandomDate(
+        \DateTime $startDate,
+        int $percentOfNull) : \DateTime|null
+    {
+        if(random_int(1,100) > $percentOfNull){
+            return self::faker()->dateTimeBetween($startDate, 'now');
+        }
+
+        return null;
     }
 
     /**
